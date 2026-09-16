@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tasks - 스마트 일정 & 프로젝트 관리</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- 상단 헤더: 앱 타이틀 및 서브타이틀 -->
+    <header class="app-header">
+      <div class="header-content">
+        <h1 class="app-title">My Tasks</h1>
+        <p class="app-subtitle">매일매일의 자잘한 할 일부터 장기 프로젝트까지 똑똑하게 관리하세요 💛</p>
+      </div>
+    </header>
+
+    <!-- 대시보드 그리드 레이아웃 (데스크톱 2컬럼, 모바일/태블릿 반응형 스택) -->
+    <main class="dashboard-grid">
+      <!-- 좌측 사이드바: 통계 카드, 입력 폼, 일자별 활동 기록(연/월/일), 키워드 팁 -->
+      <aside class="dashboard-sidebar">
+        <!-- 1. 진행률 & 통계 카드 -->
+        <section class="dashboard-card progress-card">
+          <div class="card-header">
+            <h2 class="card-title">진행 상황 🐣</h2>
+            <span class="task-stats" id="task-stats">0 / 0 완료</span>
+          </div>
+          <div class="progress-info">
+            <span class="progress-label">전체 달성률</span>
+            <span class="progress-percentage" id="progress-percentage">0%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </section>
+
+        <!-- 2. 새 할 일 추가 카드 (마감 시한 캘린더 피커 포함) -->
+        <section class="dashboard-card input-card">
+          <h2 class="card-title">새 할 일 추가 ✨</h2>
+          <form id="todo-form" class="todo-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="todo-input" class="form-label">할 일 내용</label>
+              <input
+                type="text"
+                id="todo-input"
+                class="todo-input"
+                placeholder="할 일을 입력하세요... (예: 주간 회의, 헬스 운동)"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="category-select" class="form-label">카테고리</label>
+                <select id="category-select" class="category-select">
+                  <option value="personal">개인</option>
+                  <option value="work">업무</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="due-date-input" class="form-label">마감 시한 📅</label>
+                <input type="date" id="due-date-input" class="due-date-input" />
+              </div>
+            </div>
+            <!-- 프로젝트 선택 옵션 (프로젝트 존재 시 연동 가능) -->
+            <div class="form-group" id="project-select-group">
+              <label for="todo-project-select" class="form-label">프로젝트 연결 (선택)</label>
+              <select id="todo-project-select" class="category-select">
+                <option value="">일반 단독 할 일 (프로젝트 없음)</option>
+              </select>
+            </div>
+            <button type="submit" id="add-btn" class="add-btn full-width">추가하기 🚀</button>
+          </form>
+        </section>
+
+        <!-- 3. 일자별 활동 기록 카드 (연/월/일 단위 귀여운 필터 & 네비게이터) -->
+        <section class="dashboard-card daily-activity-card">
+          <div class="card-header">
+            <h2 class="card-title">활동 기록 🗓️</h2>
+            <button type="button" id="reset-filter-btn" class="reset-filter-btn" title="전체 목록 보기">전체 보기 🌈</button>
+          </div>
+          
+          <!-- 연/월/일 귀여운 필터 칩 탭 -->
+          <div class="activity-filter-chips">
+            <button type="button" class="cute-chip" data-mode="year">연도별 🌟</button>
+            <button type="button" class="cute-chip active" data-mode="month">월별 🗓️</button>
+            <button type="button" class="cute-chip" data-mode="day">일별 📅</button>
+          </div>
+
+          <!-- 기간 네비게이터 (이전/다음/오늘) -->
+          <div class="activity-navigator">
+            <button type="button" id="prev-period-btn" class="cute-nav-btn" title="이전 기간">◀</button>
+            <span id="activity-period-label" class="activity-period-label">2026년 9월</span>
+            <button type="button" id="next-period-btn" class="cute-nav-btn" title="다음 기간">▶</button>
+            <button type="button" id="today-period-btn" class="cute-today-btn" title="현재 기간으로">오늘 🐾</button>
+          </div>
+
+          <p class="activity-desc">날짜나 기간을 클릭하면 해당 작업들을 모아볼 수 있어요!</p>
+          <div class="daily-list-scroll">
+            <ul id="daily-activity-list" class="daily-activity-list">
+              <!-- 자바스크립트로 일자별 [등록 N건 | 완료 M건] 렌더링 -->
+            </ul>
+          </div>
+        </section>
+
+        <!-- 4. 스마트 자동 분류 안내 팁 카드 -->
+        <section class="dashboard-card tip-card">
+          <div class="tip-header">
+            <span class="tip-icon">💡</span>
+            <strong class="tip-title">스마트 자동 분류 팁</strong>
+          </div>
+          <p class="tip-desc">키워드를 입력하면 카테고리가 실시간으로 자동 선택됩니다.</p>
+          <div class="tip-tags">
+            <span class="badge badge-work">업무: 회의, 보고서, 개발, PR...</span>
+            <span class="badge badge-personal">개인: 운동, 장보기, 병원, 독서...</span>
+          </div>
+        </section>
+      </aside>
+
+      <!-- 우측 메인 패널: 뷰 전환 탭 & 할 일 / 프로젝트 목록 영역 -->
+      <section class="dashboard-main dashboard-card list-card">
+        <!-- 메인 뷰 전환 탭 바 -->
+        <div class="main-tabs-wrapper">
+          <div class="main-tabs">
+            <button type="button" class="view-tab-btn active" data-view="todos">📋 데일리 할 일</button>
+            <button type="button" class="view-tab-btn" data-view="projects">🚀 장기 프로젝트</button>
+            <button type="button" class="view-tab-btn" data-view="all">🌟 전체 모아보기</button>
+          </div>
+          <button type="button" id="open-project-modal-btn" class="new-project-btn">+ 새 프로젝트 만들기 🎨</button>
+        </div>
+
+        <!-- 리스트 헤더 정보 -->
+        <div class="list-header">
+          <div class="list-title-wrap">
+            <h2 class="card-title" id="list-title">데일리 할 일 목록</h2>
+            <span class="list-count-badge" id="list-count-badge">0개 항목</span>
+          </div>
+          <div class="list-filter-status" id="list-filter-status"></div>
+        </div>
+
+        <!-- 1. 일반 할 일 및 전체 뷰 컨테이너 -->
+        <div class="list-container" id="todos-view-container">
+          <ul id="todo-list" class="todo-list">
+            <!-- 자바스크립트를 통해 동적으로 할 일 항목(li)이 추가됩니다 -->
+          </ul>
+        </div>
+
+        <!-- 2. 프로젝트 관리 뷰 컨테이너 -->
+        <div class="projects-container hidden" id="projects-view-container">
+          <div id="projects-list" class="projects-list">
+            <!-- 자바스크립트를 통해 동적으로 프로젝트 카드들이 렌더링됩니다 -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 진행 상황 메모 모달창 -->
+  <div id="memo-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">📝</span>
+          <h3 class="modal-title">진행 상황 메모</h3>
+        </div>
+        <button type="button" id="modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-todo-info">
+          <p class="modal-todo-content" id="modal-todo-content"></p>
+          <div class="modal-todo-meta">
+            <span class="meta-item" id="modal-todo-created"></span>
+            <span class="meta-item" id="modal-todo-due"></span>
+          </div>
+        </div>
+        <div class="memo-field">
+          <label for="memo-textarea" class="memo-label">세부 진행 상황 & 체크리스트</label>
+          <textarea
+            id="memo-textarea"
+            class="memo-textarea"
+            placeholder="진행 중인 세부 내용, 참고 링크, 해야 할 것들을 기록하세요..."
+            rows="6"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="memo-cancel-btn" class="modal-btn cancel-btn">닫기</button>
+        <button type="button" id="memo-save-btn" class="modal-btn save-btn-primary">메모 저장 💾</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 새 프로젝트 생성 모달창 -->
+  <div id="project-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🚀</span>
+          <h3 class="modal-title" id="project-modal-title">새 장기 프로젝트 생성</h3>
+        </div>
+        <button type="button" id="project-modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <form id="project-form" onsubmit="return false;">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="project-title-input" class="form-label">프로젝트명</label>
+            <input
+              type="text"
+              id="project-title-input"
+              class="todo-input"
+              placeholder="예: 웹 서비스 런칭, 자격증 취득 준비"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="project-overview-input" class="form-label">프로젝트 개요 및 목표</label>
+            <textarea
+              id="project-overview-input"
+              class="memo-textarea"
+              placeholder="프로젝트의 목적, 핵심 목표, 마일스톤 등을 자유롭게 요약해 보세요..."
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <div class="category-header-wrap">
+              <label class="form-label">분류 설정 (대분류는 필수 📌, 중분류는 선택 🏷️)</label>
+              <button type="button" id="add-category-row-btn" class="add-row-btn">+ 분류 추가 ➕</button>
+            </div>
+            <p class="form-hint">대분류와 중분류를 한 칸씩 입력하고 필요에 따라 자유롭게 추가/삭제하세요.</p>
+            <div id="category-rows-container" class="category-rows-container">
+              <!-- 자바스크립트로 대분류(필수)/중분류(선택) 입력 행이 추가됩니다 -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="project-cancel-btn" class="modal-btn cancel-btn">취소</button>
+          <button type="submit" id="project-modal-submit-btn" class="modal-btn save-btn-primary">프로젝트 생성 ✨</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

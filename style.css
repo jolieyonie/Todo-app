@@ -50,10 +50,17 @@
   --transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-* {
+html {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  box-sizing: inherit;
 }
 
 body {
@@ -61,9 +68,12 @@ body {
   background: var(--bg-gradient);
   background-attachment: fixed;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   padding: 36px 20px;
   color: var(--text-main);
   line-height: 1.5;
@@ -1416,16 +1426,32 @@ body {
 .save-btn-primary:hover { background: var(--primary-hover); }
 
 /* ==========================================================================
-   반응형 미디어 쿼리 (태블릿 & 모바일)
+   반응형 미디어 쿼리 (태블릿 & 모바일 전면 최적화)
    ========================================================================== */
 @media (max-width: 1023px) {
+  body {
+    padding: 20px 14px;
+    align-items: flex-start;
+  }
+
   .app-container {
-    padding: 28px 20px;
+    padding: 24px 18px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
+    gap: 20px;
+  }
+
+  .dashboard-sidebar,
+  .main-content-column {
+    width: 100%;
+    min-width: 0;
   }
 
   .dashboard-sidebar {
@@ -1441,41 +1467,129 @@ body {
 
   .list-card {
     min-height: 400px;
+    width: 100%;
+    min-width: 0;
   }
 }
 
 @media (max-width: 640px) {
   body {
-    padding: 14px 8px;
+    padding: 10px 8px;
+    align-items: flex-start;
   }
 
   .app-container {
-    padding: 18px 14px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 16px 12px;
     border-radius: 18px;
+    gap: 16px;
+    box-shadow: var(--shadow-md);
   }
 
   .app-title {
-    font-size: 1.6rem;
+    font-size: 1.55rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    gap: 14px;
+  }
+
+  .dashboard-sidebar,
+  .main-content-column {
+    width: 100%;
+    min-width: 0;
   }
 
   .dashboard-sidebar {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
   }
 
-  .form-row,
-  .inline-task-form {
+  .dashboard-card {
+    padding: 16px 14px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-row {
     flex-direction: column;
+    gap: 10px;
   }
 
+  /* 일자별 활동 네비게이터 & 칩 모바일 최적화 */
+  .activity-navigator {
+    padding: 6px 8px;
+  }
+
+  .activity-period-label {
+    font-size: 0.825rem;
+  }
+
+  .cute-nav-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.7rem;
+  }
+
+  .cute-today-btn {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+
+  .activity-filter-chips {
+    padding: 3px;
+    gap: 4px;
+  }
+
+  .cute-chip {
+    padding: 6px 4px;
+    font-size: 0.75rem;
+  }
+
+  /* 메인 뷰 전환 탭: 3단 균등 그리드로 모바일 100% 핏 */
   .main-tabs-wrapper {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  .main-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .view-tab-btn {
+    padding: 7px 4px;
+    font-size: 0.75rem;
+    white-space: normal;
+    text-align: center;
+    word-break: keep-all;
+    line-height: 1.25;
   }
 
   .new-project-btn {
+    width: 100%;
     text-align: center;
+    padding: 9px 14px;
+    font-size: 0.85rem;
   }
 
   .tip-card {
@@ -1484,6 +1598,179 @@ body {
 
   .list-card {
     min-height: 320px;
-    padding: 14px;
+    padding: 14px 12px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* 할 일 리스트 아이템 모바일 최적화: 내용과 액션 버튼을 2줄로 편안하게 분리 */
+  .todo-item {
+    padding: 12px 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .todo-main {
+    flex: 1;
+    min-width: calc(100% - 34px);
+  }
+
+  .todo-text {
+    font-size: 0.925rem;
+  }
+
+  .todo-meta {
+    gap: 6px;
+    font-size: 0.725rem;
+  }
+
+  .todo-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed #f1f5f9;
+    margin-top: 4px;
+  }
+
+  .todo-actions .badge {
+    margin-right: auto;
+  }
+
+  .todo-actions button {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+
+  /* 프로젝트 카드 아코디언 헤더 모바일 최적화 */
+  .project-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .project-header {
+    padding: 14px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .project-title-box {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .project-title {
+    font-size: 1.05rem;
+  }
+
+  .project-header-right {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .project-progress-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .project-progress-bar {
+    width: 100%;
+    max-width: 80px;
+    flex: 1;
+  }
+
+  .project-progress-text {
+    font-size: 0.725rem;
+    min-width: auto;
+    white-space: nowrap;
+  }
+
+  .accordion-toggle-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  .manage-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  /* 프로젝트 바디 및 섹션 모바일 최적화 */
+  .project-body {
+    padding: 14px 10px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .project-section {
+    padding: 12px 10px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .inline-task-form {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .inline-task-input,
+  .inline-task-date,
+  .inline-task-btn {
+    width: 100%;
+  }
+
+  /* 모달창 모바일 반응형 핏 */
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-card {
+    max-width: 100%;
+    border-radius: var(--radius-md);
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-title {
+    font-size: 1.05rem;
+  }
+
+  .modal-body {
+    padding: 16px 14px;
+    gap: 12px;
+  }
+
+  .category-input-row {
+    gap: 6px;
+  }
+
+  .major-cat-input {
+    flex: 1.1;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .sub-cat-input {
+    flex: 0.9;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .modal-footer {
+    padding: 12px 14px;
+  }
+
+  .modal-btn {
+    padding: 8px 14px;
+    font-size: 0.825rem;
   }
 }
